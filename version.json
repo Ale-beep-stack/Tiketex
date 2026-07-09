@@ -1,0 +1,12 @@
+{
+  "version": "1.0.0",
+  "fecha": "2026-07-08",
+  "cambios": [
+    "Primera versión estable",
+    "Extracción automática de datos de facturas PDF",
+    "Generación de tickets térmicos",
+    "Control de inventario integrado",
+    "Sistema de múltiples emisores",
+    "Auto-actualización desde GitHub"
+  ]
+}

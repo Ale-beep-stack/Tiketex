@@ -1,0 +1,10 @@
+# Dependencias compatibles con Windows 7 32 bits y Python 3.7.9
+PyPDF2==3.0.1
+reportlab==3.5.68  # Última versión compatible con Pillow 8.x
+Pillow==8.4.0  # Última versión compatible con Python 3.7
+PyMuPDF==1.19.6  # Compatible con Python 3.7
+pyinstaller==4.10  # Versión estable para Python 3.7 y Win7
+numpy==1.21.6  # Última versión compatible con Python 3.7
+pywin32==304  # Versión compatible con Python 3.7
+tkcalendar==1.6.1
+babel==2.9.1  # Requerido por reportlab

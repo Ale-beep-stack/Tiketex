@@ -2,7 +2,7 @@
 ; Generador de Tickets - Instalador Automático
 
 #define MyAppName "Generador de Tickets"
-#define MyAppVersion "1.0.7"
+#define MyAppVersion "1.0.8"
 #define MyAppPublisher "TiketEx"
 #define MyAppExeName "GeneradorTickets.exe"
 

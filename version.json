@@ -1,11 +1,11 @@
 {
-  "version": "1.0.7",
+  "version": "1.0.8",
   "fecha": "2026-07-10",
   "cambios": [
-    "Instalación ahora en AppData Local (sin permisos de administrador)",
-    "Ruta por defecto: C:\\Users\\[usuario]\\AppData\\Local\\Generador de Tickets",
-    "Ya no requiere permisos de administrador para instalar",
-    "Auto-actualizador completamente funcional",
-    "Todos los datos del ticket se muestran correctamente"
+    "MEJORADO: Sistema de impresión para impresoras térmicas",
+    "Múltiples métodos de impresión (win32print directo, SumatraPDF, estándar)",
+    "Mejor manejo de errores de impresión con mensajes claros",
+    "Soporte mejorado para impresoras térmicas como 3nstar RPT004",
+    "Instalación en AppData Local (sin permisos de administrador)"
   ]
 }

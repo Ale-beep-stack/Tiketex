@@ -345,7 +345,7 @@ def imprimir_ticket(ruta_pdf: str, impresora: str = None):
     
     try:
         if sistema == "Windows":
-            # Método mejorado para Windows usando win32print
+            # Método mejorado para Windows con impresoras térmicas
             try:
                 import win32print
                 import win32api
@@ -354,8 +354,76 @@ def imprimir_ticket(ruta_pdf: str, impresora: str = None):
                 if not impresora:
                     impresora = win32print.GetDefaultPrinter()
                 
-                # Método 1: Usar ShellExecute para imprimir (más confiable)
                 print(f"Imprimiendo en: {impresora}")
+                
+                # Intentar imprimir usando SumatraPDF (mejor para impresoras térmicas)
+                # Si no está disponible, usar el método estándar
+                try:
+                    # Buscar SumatraPDF en ubicaciones comunes
+                    import os
+                    sumatra_paths = [
+                        os.path.join(os.environ.get('ProgramFiles', 'C:\\Program Files'), 'SumatraPDF', 'SumatraPDF.exe'),
+                        os.path.join(os.environ.get('ProgramFiles(x86)', 'C:\\Program Files (x86)'), 'SumatraPDF', 'SumatraPDF.exe'),
+                        os.path.join(os.environ.get('LOCALAPPDATA', ''), 'SumatraPDF', 'SumatraPDF.exe')
+                    ]
+                    
+                    sumatra_exe = None
+                    for path in sumatra_paths:
+                        if os.path.exists(path):
+                            sumatra_exe = path
+                            break
+                    
+                    if sumatra_exe:
+                        # Usar SumatraPDF con impresión silenciosa
+                        print(f"Usando SumatraPDF para imprimir")
+                        subprocess.Popen([
+                            sumatra_exe,
+                            '-print-to', impresora,
+                            '-silent',
+                            ruta_pdf
+                        ])
+                        print("✓ Ticket enviado a la impresora usando SumatraPDF")
+                        return True
+                except Exception as e:
+                    print(f"⚠ SumatraPDF no disponible: {e}")
+                
+                # Método 2: Usar win32print directamente para enviar RAW data
+                # Esto funciona mejor con impresoras térmicas
+                try:
+                    print("Intentando impresión directa con win32print...")
+                    
+                    # Abrir la impresora
+                    hPrinter = win32print.OpenPrinter(impresora)
+                    
+                    try:
+                        # Iniciar trabajo de impresión
+                        hJob = win32print.StartDocPrinter(hPrinter, 1, (
+                            "Ticket Factura",
+                            None,
+                            "RAW"
+                        ))
+                        
+                        win32print.StartPagePrinter(hPrinter)
+                        
+                        # Leer el PDF y enviarlo como datos RAW
+                        with open(ruta_pdf, 'rb') as f:
+                            pdf_data = f.read()
+                            win32print.WritePrinter(hPrinter, pdf_data)
+                        
+                        win32print.EndPagePrinter(hPrinter)
+                        win32print.EndDocPrinter(hPrinter)
+                        
+                        print("✓ Ticket enviado a la impresora usando win32print RAW")
+                        return True
+                        
+                    finally:
+                        win32print.ClosePrinter(hPrinter)
+                        
+                except Exception as e:
+                    print(f"⚠ Error con win32print directo: {e}")
+                
+                # Método 3: Usar Adobe Reader / sistema predeterminado
+                print("Usando método estándar de Windows (ShellExecute)...")
                 win32api.ShellExecute(
                     0,
                     "print",
@@ -365,6 +433,7 @@ def imprimir_ticket(ruta_pdf: str, impresora: str = None):
                     0
                 )
                 print("✓ Ticket enviado a la impresora usando ShellExecute")
+                print("⚠ Si no imprime correctamente, considera instalar SumatraPDF")
                 return True
                 
             except ImportError:

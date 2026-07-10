@@ -849,13 +849,28 @@ class TicketGeneratorApp:
                     return  # Usuario canceló la selección
             
             # Imprimir usando la función del módulo ticket_genrator
-            imprimir_ticket(self.ruta_pdf_generado, self.impresora_seleccionada)
+            resultado = imprimir_ticket(self.ruta_pdf_generado, self.impresora_seleccionada)
             
-            messagebox.showinfo("Éxito", 
-                f"Ticket enviado a la impresora: {self.impresora_seleccionada}")
+            if resultado:
+                messagebox.showinfo("Impresión Enviada", 
+                    f"Ticket enviado a la impresora:\n{self.impresora_seleccionada}\n\n"
+                    "Si no imprime correctamente:\n"
+                    "1. Verifica que la impresora esté encendida\n"
+                    "2. Revisa que tenga papel\n"
+                    "3. Intenta usar 'Abrir PDF' e imprimir manualmente\n\n"
+                    "Para impresoras térmicas, se recomienda instalar SumatraPDF")
+            else:
+                messagebox.showwarning("Impresión", 
+                    "No se pudo confirmar la impresión.\n"
+                    "Verifica el estado de la impresora.")
             
         except Exception as e:
-            messagebox.showerror("Error", f"Error al imprimir: {str(e)}")
+            messagebox.showerror("Error al Imprimir", 
+                f"Error: {str(e)}\n\n"
+                "Intenta:\n"
+                "1. Usar el botón 'Abrir PDF' e imprimir manualmente\n"
+                "2. Verificar que la impresora esté correctamente instalada\n"
+                "3. Revisar los permisos del programa")
     
     def abrir_pdf(self):
         """Abre el PDF generado con el visor predeterminado."""

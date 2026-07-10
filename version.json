@@ -1,11 +1,11 @@
 {
-  "version": "1.0.8",
+  "version": "1.0.9",
   "fecha": "2026-07-10",
   "cambios": [
-    "MEJORADO: Sistema de impresión para impresoras térmicas",
-    "Múltiples métodos de impresión (win32print directo, SumatraPDF, estándar)",
-    "Mejor manejo de errores de impresión con mensajes claros",
-    "Soporte mejorado para impresoras térmicas como 3nstar RPT004",
-    "Instalación en AppData Local (sin permisos de administrador)"
+    "CORREGIDO: Auto-actualizador ahora se instala automáticamente",
+    "Instalación silenciosa (sin ventanas del instalador)",
+    "El programa se cierra correctamente al actualizar",
+    "Sistema de impresión mejorado para térmicas",
+    "Instalación en AppData Local (sin permisos admin)"
   ]
 }

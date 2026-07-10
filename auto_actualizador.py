@@ -257,26 +257,47 @@ def aplicar_actualizacion(ruta_nuevo_exe, version_nueva):
         
         # Ejecutar el instalador
         logging.info("Ejecutando instalador...")
-        logging.info("El instalador pedirá confirmación para actualizar")
+        logging.info("El instalador se ejecutará en 2 segundos...")
         
-        # Ejecutar el instalador en modo silencioso con /SILENT o normal
+        # Ejecutar el instalador con /SILENT para que se instale automáticamente
         # Usamos /DIR para especificar la misma carpeta de instalación
         if getattr(sys, 'frozen', False):
             directorio_instalacion = os.path.dirname(sys.executable)
             logging.info(f"Directorio de instalación actual: {directorio_instalacion}")
             
-            # Ejecutar instalador y cerrar aplicación
-            subprocess.Popen([ruta_nuevo_exe, f'/DIR={directorio_instalacion}'])
+            # Dar tiempo para que el log se escriba
+            import time
+            time.sleep(1)
+            
+            # Ejecutar instalador en modo SILENCIOSO con parámetros de Inno Setup
+            # /VERYSILENT = instalación completamente silenciosa sin ventanas
+            # /SUPPRESSMSGBOXES = suprime cuadros de mensaje
+            # /NORESTART = no reinicia el sistema
+            # /DIR = especifica el directorio de instalación
+            logging.info(f"Lanzando: {ruta_nuevo_exe} /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /DIR={directorio_instalacion}")
+            
+            subprocess.Popen([
+                ruta_nuevo_exe,
+                '/VERYSILENT',
+                '/SUPPRESSMSGBOXES', 
+                '/NORESTART',
+                f'/DIR={directorio_instalacion}'
+            ])
         else:
             # Modo desarrollo
             subprocess.Popen([ruta_nuevo_exe])
         
-        logging.info("Instalador lanzado")
+        logging.info("Instalador lanzado correctamente")
         logging.info(f"Log guardado en: {LOG_FILE}")
         logging.info("Cerrando aplicación actual para que el instalador pueda actualizar...")
         
-        # Cerrar la aplicación actual
-        sys.exit(0)
+        # Forzar cierre de la aplicación
+        import os
+        if getattr(sys, 'frozen', False):
+            # En ejecutable, forzar cierre del proceso
+            os._exit(0)
+        else:
+            sys.exit(0)
         
         return True
         

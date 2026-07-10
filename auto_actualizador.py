@@ -10,6 +10,7 @@ import tempfile
 from pathlib import Path
 from tkinter import messagebox
 import threading
+from datetime import datetime
 
 # Configuración
 GITHUB_REPO = "Ale-beep-stack/Tiketex"
@@ -148,7 +149,7 @@ def descargar_actualizacion(url, callback_progreso=None):
         print(f"Error al descargar actualización: {e}")
         return None
 
-def aplicar_actualizacion(ruta_nuevo_exe):
+def aplicar_actualizacion(ruta_nuevo_exe, version_nueva):
     """
     Aplica la actualización reemplazando el ejecutable actual.
     """
@@ -157,27 +158,52 @@ def aplicar_actualizacion(ruta_nuevo_exe):
         if getattr(sys, 'frozen', False):
             # Estamos corriendo como ejecutable
             ruta_actual = sys.executable
+            directorio_instalacion = os.path.dirname(ruta_actual)
         else:
             # Estamos corriendo como script (desarrollo)
             print("Modo desarrollo: no se puede aplicar actualización automática")
             return False
         
-        # Crear script de actualización
+        # Actualizar version.json ANTES de reemplazar el ejecutable
+        version_file = os.path.join(directorio_instalacion, "version.json")
+        try:
+            with open(version_file, 'w', encoding='utf-8') as f:
+                json.dump({
+                    "version": version_nueva,
+                    "fecha": datetime.now().strftime("%Y-%m-%d"),
+                    "cambios": ["Actualización automática"]
+                }, f, indent=2, ensure_ascii=False)
+            print(f"✓ Archivo version.json actualizado a v{version_nueva}")
+        except Exception as e:
+            print(f"⚠ No se pudo actualizar version.json: {e}")
+        
+        # Crear script de actualización mejorado
         script_actualizacion = os.path.join(tempfile.gettempdir(), "actualizar.bat")
         
-        with open(script_actualizacion, 'w') as f:
+        with open(script_actualizacion, 'w', encoding='utf-8') as f:
             f.write('@echo off\n')
-            f.write('echo Aplicando actualizacion...\n')
-            f.write('timeout /t 2 /nobreak >nul\n')  # Esperar 2 segundos
-            f.write(f'move /y "{ruta_nuevo_exe}" "{ruta_actual}"\n')
+            f.write('chcp 65001 >nul\n')
+            f.write('echo Cerrando aplicación...\n')
+            f.write('timeout /t 3 /nobreak >nul\n')  # Esperar 3 segundos
+            f.write('echo Aplicando actualización...\n')
+            f.write(f'taskkill /F /IM "{os.path.basename(ruta_actual)}" >nul 2>&1\n')  # Forzar cierre
+            f.write('timeout /t 1 /nobreak >nul\n')
+            f.write(f'move /y "{ruta_nuevo_exe}" "{ruta_actual}" >nul 2>&1\n')
+            f.write('if %errorlevel% neq 0 (\n')
+            f.write('    echo Error al reemplazar el archivo\n')
+            f.write('    pause\n')
+            f.write('    exit /b 1\n')
+            f.write(')\n')
+            f.write('echo Actualización completada. Iniciando...\n')
+            f.write('timeout /t 1 /nobreak >nul\n')
             f.write(f'start "" "{ruta_actual}"\n')  # Reiniciar la aplicación
             f.write(f'del "%~f0"\n')  # Eliminar el script
         
         print(f"Ejecutando script de actualización: {script_actualizacion}")
         
-        # Ejecutar el script y cerrar la aplicación
+        # Ejecutar el script
         subprocess.Popen(['cmd', '/c', script_actualizacion], 
-                        creationflags=subprocess.CREATE_NO_WINDOW)
+                        creationflags=subprocess.CREATE_NEW_CONSOLE)
         
         # Cerrar la aplicación actual
         sys.exit(0)
@@ -222,7 +248,7 @@ def verificar_y_actualizar_async(ventana_principal=None, silencioso=False):
                 if ruta_descarga:
                     messagebox.showinfo("Actualización", 
                         "Actualización descargada.\nLa aplicación se reiniciará ahora.")
-                    aplicar_actualizacion(ruta_descarga)
+                    aplicar_actualizacion(ruta_descarga, version_nueva)
                 else:
                     messagebox.showerror("Error", 
                         "No se pudo descargar la actualización.\nIntente más tarde.")

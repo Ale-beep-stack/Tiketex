@@ -1,9 +1,9 @@
 {
-  "version": "1.0.1",
+  "version": "1.0.2",
   "fecha": "2026-07-10",
   "cambios": [
-    "Corregido error de permisos al generar tickets",
-    "Los tickets ahora se guardan en Documentos/GeneradorTickets/Tickets",
-    "Mejora en la estabilidad de guardado de archivos"
+    "Corregido bucle infinito en auto-actualización",
+    "Mejorado proceso de reemplazo del ejecutable",
+    "Actualización ahora funciona correctamente"
   ]
 }

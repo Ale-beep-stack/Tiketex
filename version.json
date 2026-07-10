@@ -1,9 +1,9 @@
 {
-  "version": "1.0.3",
+  "version": "1.0.4",
   "fecha": "2026-07-10",
   "cambios": [
-    "Corregido definitivamente el bucle de actualización",
-    "Mejorado cierre de ventana antes de actualizar",
-    "Proceso de actualización más robusto"
+    "Agregado sistema de logs detallado para debugging",
+    "Los logs se guardan en Documentos/GeneradorTickets/Logs",
+    "Mejoras en el proceso de actualización"
   ]
 }

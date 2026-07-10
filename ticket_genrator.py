@@ -246,6 +246,11 @@ def generar_ticket(datos: dict, ruta_salida: str = None) -> str:
     
     # CÓDIGO QR al final (si existe)
     qr_path = datos.get("qr_path")
+    
+    # Información de contacto del emisor (SIEMPRE mostrar, incluso sin QR)
+    emisor_gmail = emisor.get("gmail", "")
+    emisor_telefono = emisor.get("telefono", "")
+    
     if qr_path and os.path.exists(qr_path):
         try:
             from PIL import Image
@@ -292,22 +297,25 @@ def generar_ticket(datos: dict, ruta_salida: str = None) -> str:
             y = dibujar_texto_centrado(c, "Consulte su DTE", ancho / 2, y)
             y -= 4 * mm_unit
             
-            # Email debajo del texto del QR (si existe en el emisor)
-            emisor_gmail = emisor.get("gmail", "")
-            if emisor_gmail:
-                y = dibujar_texto_centrado(c, f"Gmail: {emisor_gmail}", ancho / 2, y)
-                y -= 3 * mm_unit
-            
-            # Teléfono debajo del email (si existe en el emisor)
-            emisor_telefono = emisor.get("telefono", "")
-            if emisor_telefono:
-                y = dibujar_texto_centrado(c, f"Telefono: {emisor_telefono}", ancho / 2, y)
-            
             print(f"✓ Código QR agregado al ticket correctamente")
         except Exception as e:
             print(f"⚠ Error al agregar QR al ticket: {e}")
             import traceback
             traceback.print_exc()
+    else:
+        print(f"⚠ No se encontró QR code para agregar al ticket")
+        # Dejar espacio para info de contacto aunque no haya QR
+        y -= 5 * mm_unit
+    
+    # Mostrar información de contacto SIEMPRE (con o sin QR)
+    c.setFont("Courier", 7)
+    if emisor_gmail:
+        y = dibujar_texto_centrado(c, f"Gmail: {emisor_gmail}", ancho / 2, y)
+        y -= 3 * mm_unit
+    
+    if emisor_telefono:
+        y = dibujar_texto_centrado(c, f"Telefono: {emisor_telefono}", ancho / 2, y)
+        y -= 3 * mm_unit
     
     # Guardar el PDF
     c.save()

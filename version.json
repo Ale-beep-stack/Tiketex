@@ -1,9 +1,10 @@
 {
-  "version": "1.0.4",
+  "version": "1.0.5",
   "fecha": "2026-07-10",
   "cambios": [
-    "Agregado sistema de logs detallado para debugging",
-    "Los logs se guardan en Documentos/GeneradorTickets/Logs",
-    "Mejoras en el proceso de actualización"
+    "Corregido: Sello de Recepción ahora se extrae y muestra correctamente",
+    "Corregido: Código QR ahora se muestra correctamente en el ticket",
+    "Corregido: Email (Gmail) y Teléfono del emisor ahora aparecen en el ticket",
+    "Mejorados patrones de extracción de datos del PDF"
   ]
 }

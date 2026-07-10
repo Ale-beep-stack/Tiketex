@@ -99,57 +99,61 @@ def extraer_datos_factura(texto: str) -> Dict:
         print(f"DEBUG: Código de Generación encontrado: {datos['codigo_generacion']}")
     
     # Extraer Sello de Recepción (formato: 2025A6FEC43660F84BB093C7376BC8EF5FF3ABXF)
-    print(f"DEBUG: Buscando sello de recepción en el texto... [VERSIÓN ACTUALIZADA 2026-01-27]")
+    print(f"DEBUG: Buscando sello de recepción en el texto... [VERSIÓN MEJORADA 2026-07-10]")
     
-    # Patrón 1: Buscar directamente después de "Sello de Recepción:" 
-    # El sello puede estar pegado al DTE o separado, así que buscamos cualquier cadena alfanumérica larga
-    # Formato en PDF: "Sello de Recepción: 202577BF84C583F1410E90628990A08EB89D2MQ4"
-    # Formato extraído: "Sello de Recepción:DTE-01-M001P001-0000000000001532025478AA53AEFD74A3EA9E0820E4B418618TFYB"
-    patron1 = r'Sello\s+de\s+Recepción\s*:\s*(?:DTE-\d{2}-[A-Z0-9]+-\d{12,15})?([A-Z0-9]{40,50}?)(?=Modelo|MODELO|Tipo|TIPO|Fecha)'
-    print(f"DEBUG: Probando patrón 1: {patron1[:50]}...")
-    
-    # Buscar la parte específica del texto que contiene el sello
-    sello_parte = re.search(r'Sello\s+de\s+Recepción\s*:.*?Modelo', texto, re.IGNORECASE)
+    # Buscar la parte específica del texto que contiene el sello para debug
+    sello_parte = re.search(r'Sello\s+de\s+Recepción\s*:.*?(?:Modelo|MODELO|EMISOR)', texto, re.IGNORECASE | re.DOTALL)
     if sello_parte:
-        print(f"DEBUG: Parte del sello encontrada: '{sello_parte.group(0)[:100]}...'")
+        print(f"DEBUG: Parte del sello encontrada: '{sello_parte.group(0)[:150]}...'")
     else:
-        print("DEBUG: No se encontró la parte 'Sello de Recepción:...Modelo'")
+        print("DEBUG: No se encontró la sección 'Sello de Recepción'")
     
+    # Patrón 1: Buscar directamente después de "Sello de Recepción:" con el DTE pegado
+    # Formato extraído: "Sello de Recepción:DTE-01-M001P001-0000000000001532025478AA53AEFD74A3EA9E0820E4B418618TFYB"
+    # Capturamos el hash después del número de DTE
+    patron1 = r'Sello\s+de\s+Recepción\s*:\s*DTE-\d{2}-[A-Z0-9]+-(\d{12,15})([A-Z0-9]{35,50}?)(?=Modelo|MODELO|EMISOR|Tipo|TIPO)'
     match_sello = re.search(patron1, texto, re.IGNORECASE)
     if match_sello:
-        datos["sello_recepcion"] = match_sello.group(1)
+        # El sello es el segundo grupo (el hash después del número)
+        datos["sello_recepcion"] = match_sello.group(2)
         print(f"DEBUG: Sello de Recepción encontrado (patrón 1): {datos['sello_recepcion']}")
     else:
         print(f"DEBUG: Patrón 1 no encontró sello, intentando patrón 2...")
-        # Patrón 2: Buscar después del DTE cuando está pegado
-        # Formato: DTE-01-M001P001-0000000000001352025A6FEC43660F84BB093C7376BC8EF5FF3ABXFModelo
-        match_sello2 = re.search(r'DTE-\d{2}-[A-Z0-9]+-\d{12,15}([A-Z0-9]{40,50}?)(?=Modelo|MODELO|Tipo|TIPO)', texto, re.IGNORECASE)
+        
+        # Patrón 2: Buscar después de "Sello de Recepción:" sin el DTE pegado
+        # Formato en PDF: "Sello de Recepción: 202577BF84C583F1410E90628990A08EB89D2MQ4"
+        patron2 = r'Sello\s+de\s+Recepción\s*:\s*([A-Z0-9]{35,50}?)(?=\s*(?:Modelo|MODELO|EMISOR|Tipo|TIPO))'
+        match_sello2 = re.search(patron2, texto, re.IGNORECASE)
         if match_sello2:
             datos["sello_recepcion"] = match_sello2.group(1)
             print(f"DEBUG: Sello de Recepción encontrado (patrón 2): {datos['sello_recepcion']}")
         else:
             print(f"DEBUG: Patrón 2 no encontró sello, intentando patrón 3...")
-            # Patrón 3: Buscar cualquier cadena larga después del DTE (más corta, 35+ caracteres)
-            match_sello3 = re.search(r'DTE-\d{2}-[A-Z0-9]+-\d{12,15}([A-Z0-9]{35,50}?)(?=Modelo|EMISOR|Previo|modelo|Tipo)', texto, re.IGNORECASE)
+            
+            # Patrón 3: Buscar cualquier cadena larga después del número de DTE 
+            # Formato: DTE-01-M001P001-0000000000001352025A6FEC43660F84BB093C7376BC8EF5FF3ABXFModelo
+            patron3 = r'DTE-\d{2}-[A-Z0-9]+-\d{12,15}([A-Z0-9]{35,50}?)(?=Modelo|MODELO|EMISOR|Tipo|TIPO)'
+            match_sello3 = re.search(patron3, texto, re.IGNORECASE)
             if match_sello3:
                 datos["sello_recepcion"] = match_sello3.group(1)
                 print(f"DEBUG: Sello de Recepción encontrado (patrón 3): {datos['sello_recepcion']}")
             else:
                 print(f"DEBUG: Patrón 3 no encontró sello, intentando patrón 4...")
-                # Patrón 4: Último intento - buscar después de "Sello de Recepción:" cualquier cadena larga
-                match_sello4 = re.search(r'Sello\s+de\s+Recepción\s*:\s*[A-Z0-9\-]*?([A-Z0-9]{40,50}?)(?=Modelo|EMISOR|Tipo|Fecha)', texto, re.IGNORECASE)
+                
+                # Patrón 4: Buscar hash largo antes de la palabra "Modelo"
+                # Esto captura cualquier hash que esté justo antes de "Modelo"
+                patron4 = r'([A-Z0-9]{35,50})\s*(?:Modelo|MODELO)'
+                match_sello4 = re.search(patron4, texto, re.IGNORECASE)
                 if match_sello4:
-                    datos["sello_recepcion"] = match_sello4.group(1)
-                    print(f"DEBUG: Sello de Recepción encontrado (patrón 4): {datos['sello_recepcion']}")
-                else:
-                    print(f"DEBUG: Patrón 4 no encontró sello, intentando patrón 5 (simple)...")
-                    # Patrón 5: Muy simple - buscar 40 caracteres alfanuméricos antes de "Modelo"
-                    match_sello5 = re.search(r'([A-Z0-9]{40})(?=Modelo)', texto, re.IGNORECASE)
-                    if match_sello5:
-                        datos["sello_recepcion"] = match_sello5.group(1)
-                        print(f"DEBUG: Sello de Recepción encontrado (patrón 5 - simple): {datos['sello_recepcion']}")
+                    candidato = match_sello4.group(1)
+                    # Verificar que no sea el número de DTE (no debe contener guiones)
+                    if '-' not in candidato:
+                        datos["sello_recepcion"] = candidato
+                        print(f"DEBUG: Sello de Recepción encontrado (patrón 4): {datos['sello_recepcion']}")
                     else:
-                        print(f"DEBUG: No se pudo encontrar el sello de recepción")
+                        print(f"DEBUG: Patrón 4 descartó candidato con guiones: {candidato}")
+                else:
+                    print(f"DEBUG: No se pudo encontrar el sello de recepción con ningún patrón")
     
     # Si no se encuentra DTE, buscar número de factura tradicional
     if not datos["numero_factura"]:

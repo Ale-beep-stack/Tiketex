@@ -49,11 +49,25 @@ def obtener_version_actual():
     try:
         logging.info("=== Obteniendo versión actual ===")
         
-        # Si estamos en ejecutable, buscar version.json en la carpeta de instalación
+        # Usar AppData para evitar problemas de permisos en Program Files
+        appdata_dir = os.path.join(os.path.expanduser("~"), "AppData", "Local", "GeneradorTickets")
+        version_file_appdata = os.path.join(appdata_dir, VERSION_FILE)
+        
+        # Si estamos en ejecutable, buscar primero en AppData, luego en carpeta de instalación
         if getattr(sys, 'frozen', False):
+            # Intentar AppData primero
+            if os.path.exists(version_file_appdata):
+                logging.info(f"Modo ejecutable. Encontrado en AppData: {version_file_appdata}")
+                with open(version_file_appdata, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    version = data.get("version", VERSION_ACTUAL)
+                    logging.info(f"Versión encontrada en AppData: {version}")
+                    return version
+            
+            # Fallback: buscar en carpeta de instalación
             directorio = os.path.dirname(sys.executable)
             version_file = os.path.join(directorio, VERSION_FILE)
-            logging.info(f"Modo ejecutable. Buscando en: {version_file}")
+            logging.info(f"No encontrado en AppData. Buscando en instalación: {version_file}")
         else:
             version_file = VERSION_FILE
             logging.info(f"Modo desarrollo. Buscando en: {version_file}")
@@ -63,6 +77,17 @@ def obtener_version_actual():
                 data = json.load(f)
                 version = data.get("version", VERSION_ACTUAL)
                 logging.info(f"Versión encontrada en archivo: {version}")
+                
+                # Copiar a AppData para futuras actualizaciones
+                if getattr(sys, 'frozen', False):
+                    try:
+                        os.makedirs(appdata_dir, exist_ok=True)
+                        with open(version_file_appdata, 'w', encoding='utf-8') as f_out:
+                            json.dump(data, f_out, indent=2, ensure_ascii=False)
+                        logging.info(f"Versión copiada a AppData para futuras actualizaciones")
+                    except Exception as e:
+                        logging.warning(f"No se pudo copiar version.json a AppData: {e}")
+                
                 return version
         else:
             logging.warning(f"Archivo version.json no encontrado en: {version_file}")
@@ -139,7 +164,8 @@ def verificar_actualizacion():
             for asset in assets:
                 nombre = asset.get("name", "")
                 logging.info(f"  - {nombre}")
-                if nombre.endswith(".exe") and "Instalador" not in nombre:
+                # Aceptar cualquier archivo .exe (incluyendo los que tienen "Instalador")
+                if nombre.endswith(".exe"):
                     url_descarga = asset.get("browser_download_url")
                     logging.info(f"✓ Ejecutable encontrado: {nombre}")
                     break
@@ -204,104 +230,50 @@ def descargar_actualizacion(url, callback_progreso=None):
 
 def aplicar_actualizacion(ruta_nuevo_exe, version_nueva):
     """
-    Aplica la actualización reemplazando el ejecutable actual.
+    Ejecuta el instalador descargado para actualizar el programa.
+    El instalador se encarga de reemplazar los archivos y actualizar version.json.
     """
     try:
         logging.info("=== Aplicando actualización ===")
+        logging.info(f"Instalador descargado: {ruta_nuevo_exe}")
         
-        # Obtener ruta del ejecutable actual
-        if getattr(sys, 'frozen', False):
-            # Estamos corriendo como ejecutable
-            ruta_actual = sys.executable
-            directorio_instalacion = os.path.dirname(ruta_actual)
-            logging.info(f"Ejecutable actual: {ruta_actual}")
-            logging.info(f"Directorio instalación: {directorio_instalacion}")
-        else:
-            # Estamos corriendo como script (desarrollo)
-            logging.warning("Modo desarrollo: no se puede aplicar actualización automática")
-            return False
+        # Actualizar version.json en AppData para registrar la nueva versión
+        appdata_dir = os.path.join(os.path.expanduser("~"), "AppData", "Local", "GeneradorTickets")
+        os.makedirs(appdata_dir, exist_ok=True)
+        version_file_appdata = os.path.join(appdata_dir, "version.json")
         
-        # Actualizar version.json ANTES de reemplazar el ejecutable
-        version_file = os.path.join(directorio_instalacion, "version.json")
-        logging.info(f"Actualizando {version_file} a versión {version_nueva}")
+        logging.info(f"Actualizando version.json en AppData: {version_file_appdata}")
         
         try:
-            with open(version_file, 'w', encoding='utf-8') as f:
+            with open(version_file_appdata, 'w', encoding='utf-8') as f:
                 json.dump({
                     "version": version_nueva,
                     "fecha": datetime.now().strftime("%Y-%m-%d"),
                     "cambios": ["Actualización automática"]
                 }, f, indent=2, ensure_ascii=False)
-            logging.info(f"✓ Archivo version.json actualizado correctamente")
+            logging.info(f"✓ version.json actualizado en AppData correctamente")
         except Exception as e:
-            logging.error(f"⚠ No se pudo actualizar version.json: {e}", exc_info=True)
+            logging.error(f"⚠ No se pudo actualizar version.json en AppData: {e}", exc_info=True)
         
-        # Crear script de actualización mejorado con logging
-        script_actualizacion = os.path.join(tempfile.gettempdir(), "actualizar.bat")
-        nombre_ejecutable = os.path.basename(ruta_actual)
+        # Ejecutar el instalador
+        logging.info("Ejecutando instalador...")
+        logging.info("El instalador pedirá confirmación para actualizar")
         
-        logging.info(f"Creando script de actualización: {script_actualizacion}")
-        logging.info(f"Nuevo ejecutable: {ruta_nuevo_exe}")
+        # Ejecutar el instalador en modo silencioso con /SILENT o normal
+        # Usamos /DIR para especificar la misma carpeta de instalación
+        if getattr(sys, 'frozen', False):
+            directorio_instalacion = os.path.dirname(sys.executable)
+            logging.info(f"Directorio de instalación actual: {directorio_instalacion}")
+            
+            # Ejecutar instalador y cerrar aplicación
+            subprocess.Popen([ruta_nuevo_exe, f'/DIR={directorio_instalacion}'])
+        else:
+            # Modo desarrollo
+            subprocess.Popen([ruta_nuevo_exe])
         
-        with open(script_actualizacion, 'w', encoding='utf-8') as f:
-            f.write('@echo off\n')
-            f.write('chcp 65001 >nul\n')
-            f.write('title Actualizando Generador de Tickets...\n')
-            f.write('color 0A\n')
-            f.write('echo.\n')
-            f.write('echo ========================================\n')
-            f.write('echo  ACTUALIZANDO GENERADOR DE TICKETS\n')
-            f.write('echo ========================================\n')
-            f.write('echo.\n')
-            f.write(f'echo Versión actual: {obtener_version_actual()}\n')
-            f.write(f'echo Versión nueva: {version_nueva}\n')
-            f.write('echo.\n')
-            f.write('echo Esperando cierre de la aplicación...\n')
-            f.write('timeout /t 3 /nobreak >nul\n')
-            f.write(f'echo Cerrando procesos de {nombre_ejecutable}...\n')
-            f.write(f'taskkill /F /IM "{nombre_ejecutable}" >nul 2>&1\n')
-            f.write('timeout /t 2 /nobreak >nul\n')
-            f.write('echo.\n')
-            f.write('echo Reemplazando ejecutable...\n')
-            f.write(f'echo De: {ruta_nuevo_exe}\n')
-            f.write(f'echo A:  {ruta_actual}\n')
-            f.write('echo.\n')
-            f.write(f'move /y "{ruta_nuevo_exe}" "{ruta_actual}"\n')
-            f.write('if %errorlevel% neq 0 (\n')
-            f.write('    echo.\n')
-            f.write('    color 0C\n')
-            f.write('    echo ❌ ERROR: No se pudo actualizar el archivo\n')
-            f.write('    echo.\n')
-            f.write('    echo Posibles causas:\n')
-            f.write('    echo - El programa aun esta abierto\n')
-            f.write('    echo - Permisos insuficientes\n')
-            f.write('    echo.\n')
-            f.write('    pause\n')
-            f.write('    exit /b 1\n')
-            f.write(')\n')
-            f.write('echo.\n')
-            f.write('echo ✓ Actualización completada exitosamente!\n')
-            f.write('echo.\n')
-            f.write('echo Iniciando programa actualizado...\n')
-            f.write('timeout /t 2 /nobreak >nul\n')
-            f.write(f'start "" "{ruta_actual}"\n')
-            f.write('timeout /t 1 /nobreak >nul\n')
-            f.write('exit\n')
-        
-        logging.info(f"✓ Script de actualización creado")
-        logging.info("Ejecutando script...")
-        
-        # Ejecutar el script con ventana visible
-        subprocess.Popen(['cmd', '/c', script_actualizacion])
-        
-        logging.info("Script lanzado. Esperando 1 segundo...")
-        
-        # Dar tiempo al script para iniciarse
-        import time
-        time.sleep(1)
-        
-        logging.info("Cerrando aplicación actual...")
+        logging.info("Instalador lanzado")
         logging.info(f"Log guardado en: {LOG_FILE}")
+        logging.info("Cerrando aplicación actual para que el instalador pueda actualizar...")
         
         # Cerrar la aplicación actual
         sys.exit(0)

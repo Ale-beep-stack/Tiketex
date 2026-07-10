@@ -1,10 +1,11 @@
 {
-  "version": "1.0.5",
+  "version": "1.0.6",
   "fecha": "2026-07-10",
   "cambios": [
-    "Corregido: Sello de Recepción ahora se extrae y muestra correctamente",
-    "Corregido: Código QR ahora se muestra correctamente en el ticket",
-    "Corregido: Email (Gmail) y Teléfono del emisor ahora aparecen en el ticket",
-    "Mejorados patrones de extracción de datos del PDF"
+    "CORREGIDO: Auto-actualizador ahora funciona correctamente",
+    "version.json se guarda en AppData (evita problemas de permisos)",
+    "Instalador se descarga y ejecuta automáticamente",
+    "Ya no es necesario desinstalar manualmente para actualizar",
+    "Mejorados patrones de extracción de sello, QR, email y teléfono"
   ]
 }

@@ -2,7 +2,7 @@
 ; Generador de Tickets - Instalador Automático
 
 #define MyAppName "Generador de Tickets"
-#define MyAppVersion "1.0.4"
+#define MyAppVersion "1.0.6"
 #define MyAppPublisher "TiketEx"
 #define MyAppExeName "GeneradorTickets.exe"
 
@@ -35,8 +35,8 @@ Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
 Name: "desktopicon"; Description: "Crear un icono en el &escritorio"; GroupDescription: "Iconos adicionales:"; Flags: unchecked
 
 [Files]
-; Ejecutable principal
-Source: "dist\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+; Todos los archivos del ejecutable (método onedir de PyInstaller)
+Source: "dist\GeneradorTickets\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 ; Carpeta de diseños
 Source: "disenos\*"; DestDir: "{app}\disenos"; Flags: ignoreversion recursesubdirs createallsubdirs

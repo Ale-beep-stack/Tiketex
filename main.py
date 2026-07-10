@@ -62,7 +62,7 @@ class TicketGeneratorApp:
         # Verificar actualizaciones al iniciar (después de crear la interfaz)
         if AUTO_ACTUALIZADOR_DISPONIBLE:
             # Esperar 2 segundos para que la ventana se muestre completamente
-            self.root.after(2000, verificar_actualizacion_al_iniciar)
+            self.root.after(2000, lambda: verificar_actualizacion_al_iniciar(self.root))
     
     def crear_interfaz(self):
         # Crear sistema de frames intercambiables (sin pestañas visibles)

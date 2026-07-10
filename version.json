@@ -1,9 +1,9 @@
 {
-  "version": "1.0.2",
+  "version": "1.0.3",
   "fecha": "2026-07-10",
   "cambios": [
-    "Corregido bucle infinito en auto-actualización",
-    "Mejorado proceso de reemplazo del ejecutable",
-    "Actualización ahora funciona correctamente"
+    "Corregido definitivamente el bucle de actualización",
+    "Mejorado cierre de ventana antes de actualizar",
+    "Proceso de actualización más robusto"
   ]
 }

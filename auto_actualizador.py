@@ -179,31 +179,48 @@ def aplicar_actualizacion(ruta_nuevo_exe, version_nueva):
         
         # Crear script de actualización mejorado
         script_actualizacion = os.path.join(tempfile.gettempdir(), "actualizar.bat")
+        nombre_ejecutable = os.path.basename(ruta_actual)
         
         with open(script_actualizacion, 'w', encoding='utf-8') as f:
             f.write('@echo off\n')
             f.write('chcp 65001 >nul\n')
+            f.write('title Actualizando Generador de Tickets...\n')
+            f.write('echo.\n')
+            f.write('echo ========================================\n')
+            f.write('echo  ACTUALIZANDO GENERADOR DE TICKETS\n')
+            f.write('echo ========================================\n')
+            f.write('echo.\n')
             f.write('echo Cerrando aplicación...\n')
-            f.write('timeout /t 3 /nobreak >nul\n')  # Esperar 3 segundos
-            f.write('echo Aplicando actualización...\n')
-            f.write(f'taskkill /F /IM "{os.path.basename(ruta_actual)}" >nul 2>&1\n')  # Forzar cierre
+            # Esperar que el proceso se cierre naturalmente primero
+            f.write('timeout /t 2 /nobreak >nul\n')
+            # Luego forzar cierre por si acaso
+            f.write(f'taskkill /F /IM "{nombre_ejecutable}" >nul 2>&1\n')
             f.write('timeout /t 1 /nobreak >nul\n')
-            f.write(f'move /y "{ruta_nuevo_exe}" "{ruta_actual}" >nul 2>&1\n')
+            f.write('echo Aplicando actualización...\n')
+            f.write(f'move /y "{ruta_nuevo_exe}" "{ruta_actual}"\n')
             f.write('if %errorlevel% neq 0 (\n')
-            f.write('    echo Error al reemplazar el archivo\n')
+            f.write('    echo.\n')
+            f.write('    echo ERROR: No se pudo actualizar el archivo\n')
+            f.write('    echo Verifique que el programa esté cerrado\n')
+            f.write('    echo.\n')
             f.write('    pause\n')
             f.write('    exit /b 1\n')
             f.write(')\n')
-            f.write('echo Actualización completada. Iniciando...\n')
-            f.write('timeout /t 1 /nobreak >nul\n')
-            f.write(f'start "" "{ruta_actual}"\n')  # Reiniciar la aplicación
-            f.write(f'del "%~f0"\n')  # Eliminar el script
+            f.write('echo.\n')
+            f.write('echo Actualización completada exitosamente!\n')
+            f.write('echo Iniciando programa...\n')
+            f.write('timeout /t 2 /nobreak >nul\n')
+            f.write(f'start "" "{ruta_actual}"\n')
+            f.write('exit\n')
         
         print(f"Ejecutando script de actualización: {script_actualizacion}")
         
-        # Ejecutar el script
-        subprocess.Popen(['cmd', '/c', script_actualizacion], 
-                        creationflags=subprocess.CREATE_NEW_CONSOLE)
+        # Ejecutar el script con ventana visible temporalmente
+        subprocess.Popen(['cmd', '/c', script_actualizacion])
+        
+        # Dar tiempo al script para iniciarse
+        import time
+        time.sleep(1)
         
         # Cerrar la aplicación actual
         sys.exit(0)
@@ -246,8 +263,14 @@ def verificar_y_actualizar_async(ventana_principal=None, silencioso=False):
                 ruta_descarga = descargar_actualizacion(url_descarga)
                 
                 if ruta_descarga:
-                    messagebox.showinfo("Actualización", 
-                        "Actualización descargada.\nLa aplicación se reiniciará ahora.")
+                    # Cerrar la ventana principal ANTES de aplicar actualización
+                    if ventana_principal:
+                        try:
+                            ventana_principal.quit()
+                            ventana_principal.destroy()
+                        except:
+                            pass
+                    
                     aplicar_actualizacion(ruta_descarga, version_nueva)
                 else:
                     messagebox.showerror("Error", 
@@ -261,12 +284,12 @@ def verificar_y_actualizar_async(ventana_principal=None, silencioso=False):
     thread = threading.Thread(target=tarea, daemon=True)
     thread.start()
 
-def verificar_actualizacion_al_iniciar():
+def verificar_actualizacion_al_iniciar(ventana_principal=None):
     """
     Verifica actualizaciones al iniciar la aplicación de forma silenciosa.
     Solo muestra mensaje si hay actualización disponible.
     """
-    verificar_y_actualizar_async(silencioso=True)
+    verificar_y_actualizar_async(ventana_principal, silencioso=True)
 
 # Para testing
 if __name__ == "__main__":

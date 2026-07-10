@@ -1,0 +1,261 @@
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                                                                               ║
+║                    🚀 EMPIEZA AQUÍ - GUÍA RÁPIDA                             ║
+║                                                                               ║
+║              Sistema de Auto-Actualización para Generador de Tickets         ║
+║                                                                               ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃                                                                            ┃
+┃  📋 PASO 1: INSTALAR HERRAMIENTAS (Solo una vez)                          ┃
+┃                                                                            ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  🔧 Necesitas instalar estas 3 herramientas:
+
+  1️⃣  GitHub CLI
+      📥 https://cli.github.com/
+      ✅ Permite subir releases automáticamente
+      
+  2️⃣  Inno Setup
+      📥 https://jrsoftware.org/isdl.php
+      ✅ Crea el instalador profesional
+      
+  3️⃣  Git para Windows (si no lo tienes)
+      📥 https://git-scm.com/download/win
+      ✅ Para control de versiones
+
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃                                                                            ┃
+┃  🔐 PASO 2: AUTENTICARTE EN GITHUB                                        ┃
+┃                                                                            ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  Abre CMD o PowerShell y ejecuta:
+
+  ┌──────────────────────────────────────────────────────────────┐
+  │  gh auth login                                               │
+  └──────────────────────────────────────────────────────────────┘
+
+  Sigue estos pasos en el asistente:
+  
+  ? What account do you want to log into? 
+    → GitHub.com
+  
+  ? What is your preferred protocol for Git operations? 
+    → HTTPS
+  
+  ? Authenticate Git with your GitHub credentials?
+    → Yes
+  
+  ? How would you like to authenticate GitHub CLI?
+    → Login with a web browser
+  
+  ! First copy your one-time code: XXXX-XXXX
+  
+  Se abrirá tu navegador, pega el código y autoriza.
+  
+  ✅ Verás: "✓ Logged in as Ale-beep-stack"
+
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃                                                                            ┃
+┃  ☁️  PASO 3: SUBIR EL CÓDIGO A GITHUB                                     ┃
+┃                                                                            ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  Ya casi todo está listo. Solo falta subir el código:
+
+  Abre CMD en esta carpeta y ejecuta:
+
+  ┌──────────────────────────────────────────────────────────────┐
+  │  git push -u origin main                                     │
+  └──────────────────────────────────────────────────────────────┘
+
+  ✅ Verás algo como:
+     Enumerating objects: 58, done.
+     Writing objects: 100% (58/58), done.
+     To https://github.com/Ale-beep-stack/Tiketex.git
+      * [new branch]      main -> main
+
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃                                                                            ┃
+┃  📦 PASO 4: CREAR EL PRIMER INSTALADOR                                    ┃
+┃                                                                            ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  Doble clic en:
+
+  ┌──────────────────────────────────────────────────────────────┐
+  │  📄 COMPILAR_Y_CREAR_INSTALADOR.bat                         │
+  └──────────────────────────────────────────────────────────────┘
+
+  Esto hará:
+  1. Compilar main.py → GeneradorTickets.exe
+  2. Crear el instalador profesional
+  
+  ⏱️ Toma 2-5 minutos
+  
+  ✅ Al terminar tendrás en la carpeta "dist\":
+     - GeneradorTickets.exe
+     - GeneradorTickets_Instalador_v1.0.0.exe
+
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃                                                                            ┃
+┃  🚀 PASO 5: SUBIR EL PRIMER RELEASE                                       ┃
+┃                                                                            ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  Doble clic en:
+
+  ┌──────────────────────────────────────────────────────────────┐
+  │  📄 SUBIR_RELEASE_GITHUB.bat                                │
+  └──────────────────────────────────────────────────────────────┘
+
+  El script te preguntará:
+  
+  "¿Deseas crear el release ahora? (S/N)"
+  
+  Escribe: S
+  
+  ✅ Se subirán los archivos a GitHub
+  ⏱️ Toma 1-2 minutos
+  
+  URL del release:
+  https://github.com/Ale-beep-stack/Tiketex/releases/latest
+
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃                                                                            ┃
+┃  💻 PASO 6: INSTALAR EN LA OTRA PC                                        ┃
+┃                                                                            ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  En la otra PC, el usuario hace:
+
+  1. Abre navegador
+  2. Va a: https://github.com/Ale-beep-stack/Tiketex/releases/latest
+  3. Descarga: GeneradorTickets_Instalador_v1.0.0.exe
+  4. Doble clic
+  5. ¡Listo! Se instala todo automático
+  
+  ✅ Se crea:
+     - Icono en escritorio
+     - Entrada en menú inicio
+     - Programa listo para usar
+
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                                                                               ║
+║  🎉 ¡CONFIGURACIÓN INICIAL COMPLETA!                                         ║
+║                                                                               ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃                                                                            ┃
+┃  🔄 PARA FUTURAS ACTUALIZACIONES (SUPER FÁCIL)                            ┃
+┃                                                                            ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  Cuando hagas cambios al código:
+
+  1️⃣  Edita version.json
+      
+      Abre: version.json
+      Cambia: "version": "1.0.1"  ← Incrementa el número
+      
+  2️⃣  Sube cambios a Git
+      
+      git add .
+      git commit -m "Versión 1.0.1 - Bug fixes"
+      git push
+      
+  3️⃣  Compila nuevo instalador
+      
+      Doble clic: COMPILAR_Y_CREAR_INSTALADOR.bat
+      
+  4️⃣  Sube nuevo release
+      
+      Doble clic: SUBIR_RELEASE_GITHUB.bat
+      
+  ✅ ¡LISTO!
+  
+  En la otra PC:
+  
+  El usuario abre el programa y... ¡se actualiza automáticamente!
+  NO hace nada más.
+
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃                                                                            ┃
+┃  📚 DOCUMENTACIÓN ADICIONAL                                               ┃
+┃                                                                            ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  📄 PASOS_SIGUIENTES.md
+     └── Guía detallada paso a paso
+  
+  📄 INSTRUCCIONES_GITHUB.md
+     └── Todo sobre GitHub y releases
+  
+  📄 DIAGRAMA_FUNCIONAMIENTO.txt
+     └── Diagrama visual del sistema completo
+  
+  📄 README.md
+     └── Documentación para GitHub
+
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃                                                                            ┃
+┃  ⚡ RESUMEN SUPER RÁPIDO                                                  ┃
+┃                                                                            ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  SOLO LA PRIMERA VEZ:
+  ════════════════════
+  1. Instala: GitHub CLI + Inno Setup
+  2. Autentícate: gh auth login
+  3. Sube código: git push -u origin main
+  4. Ejecuta: COMPILAR_Y_CREAR_INSTALADOR.bat
+  5. Ejecuta: SUBIR_RELEASE_GITHUB.bat
+  
+  
+  CADA VEZ QUE HAGAS CAMBIOS:
+  ═══════════════════════════
+  1. Edita: version.json (cambia versión)
+  2. Ejecuta: git add . && git commit -m "v1.0.X" && git push
+  3. Ejecuta: COMPILAR_Y_CREAR_INSTALADOR.bat
+  4. Ejecuta: SUBIR_RELEASE_GITHUB.bat
+  
+  
+  EN LA OTRA PC:
+  ══════════════
+  ¡NO HACE NADA! Se actualiza automático 🎉
+
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                                                                               ║
+║  🎯 TU OBJETIVO LOGRADO                                                      ║
+║                                                                               ║
+║  ✅ Ya NO necesitas pasar archivos por USB                                   ║
+║  ✅ Actualizas desde tu PC en 5 minutos                                      ║
+║  ✅ Usuario no hace nada, todo automático                                    ║
+║  ✅ Un solo enlace que nunca cambia                                          ║
+║  ✅ Sistema profesional y confiable                                          ║
+║                                                                               ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+
+  ¿Necesitas ayuda?
+  
+  📧 Revisa la documentación en los archivos .md
+  🐛 Si algo no funciona, verifica los pasos del PASO 1 al 6
+  
+  
+  ¡Éxito con tu proyecto! 🚀

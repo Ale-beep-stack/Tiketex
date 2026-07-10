@@ -1,12 +1,9 @@
 {
-  "version": "1.0.0",
-  "fecha": "2026-07-08",
+  "version": "1.0.1",
+  "fecha": "2026-07-10",
   "cambios": [
-    "Primera versión estable",
-    "Extracción automática de datos de facturas PDF",
-    "Generación de tickets térmicos",
-    "Control de inventario integrado",
-    "Sistema de múltiples emisores",
-    "Auto-actualización desde GitHub"
+    "Corregido error de permisos al generar tickets",
+    "Los tickets ahora se guardan en Documentos/GeneradorTickets/Tickets",
+    "Mejora en la estabilidad de guardado de archivos"
   ]
 }

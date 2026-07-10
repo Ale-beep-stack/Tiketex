@@ -1,6 +1,9 @@
 # settings.py
 # Configuración general del sistema
 
+import os
+from pathlib import Path
+
 # Configuración de la empresa emisora
 EMPRESA = {
     "nombre": "Mi Empresa S.A.",
@@ -21,5 +24,20 @@ TICKET_CONFIG = {
     "tamano_pequeno": 7
 }
 
-# Ruta por defecto para guardar tickets
-RUTA_TICKETS = "tickets_generados"
+# Ruta por defecto para guardar tickets (en la carpeta de Documentos del usuario)
+# Esto evita problemas de permisos cuando se instala en C:\Program Files\
+def obtener_ruta_tickets():
+    """Obtiene la ruta para guardar tickets en la carpeta de Documentos del usuario."""
+    try:
+        # Intenta usar la carpeta de Documentos del usuario
+        documentos = Path.home() / "Documents" / "GeneradorTickets" / "Tickets"
+        documentos.mkdir(parents=True, exist_ok=True)
+        return str(documentos)
+    except Exception as e:
+        # Si falla, usa la carpeta temporal del sistema
+        import tempfile
+        temp_tickets = Path(tempfile.gettempdir()) / "GeneradorTickets" / "Tickets"
+        temp_tickets.mkdir(parents=True, exist_ok=True)
+        return str(temp_tickets)
+
+RUTA_TICKETS = obtener_ruta_tickets()

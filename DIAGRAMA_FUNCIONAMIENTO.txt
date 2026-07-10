@@ -1,0 +1,196 @@
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                                                                               ║
+║          🎫 GENERADOR DE TICKETS - SISTEMA DE AUTO-ACTUALIZACIÓN             ║
+║                                                                               ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│  👨‍💻 TU PC (DESARROLLO)                                                      │
+│  ══════════════════════                                                     │
+│                                                                             │
+│  1️⃣  Haces cambios en el código                                            │
+│      ├── main.py                                                            │
+│      ├── extractor.py                                                       │
+│      └── otros archivos...                                                  │
+│                                                                             │
+│  2️⃣  Actualizas version.json                                               │
+│      {                                                                      │
+│        "version": "1.0.1",  ← Incrementas                                   │
+│        "cambios": ["Bug fixes", "Nuevas funciones"]                         │
+│      }                                                                      │
+│                                                                             │
+│  3️⃣  Ejecutas: COMPILAR_Y_CREAR_INSTALADOR.bat                            │
+│      ├── 🔄 Compila con PyInstaller                                         │
+│      ├── 📦 Crea GeneradorTickets.exe                                       │
+│      └── 🎁 Crea GeneradorTickets_Instalador.exe                            │
+│                                                                             │
+│  4️⃣  Subes a Git                                                           │
+│      git add .                                                              │
+│      git commit -m "v1.0.1 - Mejoras"                                       │
+│      git push                                                               │
+│                                                                             │
+│  5️⃣  Ejecutas: SUBIR_RELEASE_GITHUB.bat                                   │
+│      └── Sube archivos compilados a GitHub                                  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    │ 📤 Upload
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│  ☁️  GITHUB (SERVIDOR)                                                      │
+│  ═════════════════════                                                      │
+│                                                                             │
+│  📂 Repositorio: Ale-beep-stack/Tiketex                                     │
+│  ├── 📝 Código fuente (main.py, etc.)                                       │
+│  └── 📦 Releases                                                            │
+│      └── v1.0.1 (Latest)                                                    │
+│          ├── GeneradorTickets.exe                                           │
+│          └── GeneradorTickets_Instalador.exe                                │
+│                                                                             │
+│  🔗 URL fija para usuarios:                                                 │
+│  https://github.com/Ale-beep-stack/Tiketex/releases/latest                 │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    │ 📥 Download (solo primera vez)
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│  💻 OTRA PC (USUARIO)                                                       │
+│  ════════════════════                                                       │
+│                                                                             │
+│  🎯 PRIMERA VEZ:                                                            │
+│  ──────────────                                                             │
+│  1. Usuario descarga: GeneradorTickets_Instalador.exe                      │
+│  2. Doble clic 🖱️                                                           │
+│  3. Instalador hace TODO automático:                                        │
+│     ├── Copia archivos a C:\Program Files\GeneradorTickets\                │
+│     ├── Crea acceso directo en escritorio 🖥️                               │
+│     ├── Crea entrada en menú inicio                                         │
+│     └── Listo! ✅                                                           │
+│                                                                             │
+│  ────────────────────────────────────────────────────────────────────────  │
+│                                                                             │
+│  🔄 ACTUALIZACIONES (AUTOMÁTICAS):                                          │
+│  ─────────────────────────────────                                          │
+│  1. Usuario abre el programa (normal)                                       │
+│     │                                                                       │
+│     ├─► 🔍 Programa verifica GitHub (2 segundos)                            │
+│     │   ├── Versión local: 1.0.0                                            │
+│     │   └── Versión GitHub: 1.0.1                                           │
+│     │                                                                       │
+│     ├─► 📢 Mensaje: "Nueva actualización disponible"                        │
+│     │   └── "¿Descargar ahora?"                                             │
+│     │                                                                       │
+│     ├─► ⬇️ Descarga GeneradorTickets.exe nuevo (10-20 seg)                 │
+│     │                                                                       │
+│     ├─► 🔄 Reemplaza ejecutable actual                                      │
+│     │                                                                       │
+│     ├─► 🔁 Reinicia programa automáticamente                                │
+│     │                                                                       │
+│     └─► ✅ ¡Actualizado a v1.0.1!                                           │
+│                                                                             │
+│  👤 Usuario: ¡NO HACE NADA!                                                 │
+│            Todo es automático                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                                                                               ║
+║  📊 COMPARACIÓN: ANTES vs DESPUÉS                                            ║
+║                                                                               ║
+╠═══════════════════════════════════════════════════════════════════════════════╣
+║                                                                               ║
+║  ❌ ANTES (Con USB):                                                          ║
+║  ────────────────────                                                         ║
+║  1. Haces cambios                                                             ║
+║  2. Compilas nuevo .exe                                                       ║
+║  3. Copias TODOS los archivos a USB 💾                                        ║
+║  4. Llevas USB a otra PC 🚗                                                   ║
+║  5. Copias archivos de USB a PC 📂                                            ║
+║  6. Reemplazas archivos manualmente ⚠️                                        ║
+║  7. Verificas que funcione ✓                                                  ║
+║                                                                               ║
+║  ⏱️ Tiempo: 15-30 minutos                                                     ║
+║  😫 Esfuerzo: Alto                                                            ║
+║  🐛 Riesgo de error: Alto                                                     ║
+║                                                                               ║
+║  ─────────────────────────────────────────────────────────────────────────   ║
+║                                                                               ║
+║  ✅ AHORA (Con GitHub):                                                       ║
+║  ───────────────────                                                          ║
+║  TU PC:                                                                       ║
+║  1. Haces cambios                                                             ║
+║  2. Ejecutas: COMPILAR_Y_CREAR_INSTALADOR.bat                                ║
+║  3. Ejecutas: SUBIR_RELEASE_GITHUB.bat                                       ║
+║  ¡Listo! 🎉                                                                   ║
+║                                                                               ║
+║  OTRA PC:                                                                     ║
+║  1. Usuario abre el programa                                                  ║
+║  2. ¡Se actualiza solo! 🚀                                                    ║
+║                                                                               ║
+║  ⏱️ Tu tiempo: 5 minutos                                                      ║
+║  ⏱️ Usuario: 0 minutos (automático)                                           ║
+║  😊 Esfuerzo: Mínimo                                                          ║
+║  ✅ Riesgo de error: Casi nulo                                                ║
+║                                                                               ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                                                                               ║
+║  🛠️ ARCHIVOS CLAVE DEL SISTEMA                                               ║
+║                                                                               ║
+╠═══════════════════════════════════════════════════════════════════════════════╣
+║                                                                               ║
+║  📄 auto_actualizador.py                                                      ║
+║  ├── Verifica versiones en GitHub                                            ║
+║  ├── Descarga actualizaciones                                                 ║
+║  └── Reemplaza ejecutable y reinicia                                          ║
+║                                                                               ║
+║  📄 version.json                                                              ║
+║  ├── Controla la versión actual                                               ║
+║  └── Define los cambios de cada versión                                       ║
+║                                                                               ║
+║  📄 crear_instalador.iss                                                      ║
+║  ├── Script de Inno Setup                                                     ║
+║  └── Genera el instalador profesional                                         ║
+║                                                                               ║
+║  📄 COMPILAR_Y_CREAR_INSTALADOR.bat                                          ║
+║  ├── Compila con PyInstaller                                                  ║
+║  └── Crea el instalador                                                       ║
+║                                                                               ║
+║  📄 SUBIR_RELEASE_GITHUB.bat                                                 ║
+║  └── Sube los archivos compilados a GitHub                                    ║
+║                                                                               ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                                                                               ║
+║  ✅ VENTAJAS DE ESTE SISTEMA                                                 ║
+║                                                                               ║
+╠═══════════════════════════════════════════════════════════════════════════════╣
+║                                                                               ║
+║  👤 Para el Usuario:                                                          ║
+║  ────────────────                                                             ║
+║  ✅ Instala una sola vez                                                      ║
+║  ✅ Actualizaciones automáticas                                               ║
+║  ✅ No necesita conocimientos técnicos                                        ║
+║  ✅ Siempre tiene la última versión                                           ║
+║  ✅ No interrumpe su trabajo                                                  ║
+║                                                                               ║
+║  👨‍💻 Para Ti (Desarrollador):                                                 ║
+║  ───────────────────────                                                      ║
+║  ✅ Actualizas desde tu PC                                                    ║
+║  ✅ No necesitas ir físicamente a la otra PC                                  ║
+║  ✅ Proceso de 5 minutos                                                      ║
+║  ✅ Sin riesgo de errores manuales                                            ║
+║  ✅ Control de versiones profesional                                          ║
+║  ✅ Historial de cambios documentado                                          ║
+║                                                                               ║
+╚═══════════════════════════════════════════════════════════════════════════════╝

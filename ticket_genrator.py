@@ -8,6 +8,7 @@ from datetime import datetime
 import os
 from settings import EMPRESA, TICKET_CONFIG, RUTA_TICKETS
 from reportlab.lib.utils import ImageReader
+from PIL import ImageWin  # Necesario para imprimir imágenes con win32print
 
 def numero_a_letras(numero):
     """Convierte un número a su representación en letras (simplificado)."""
@@ -333,6 +334,7 @@ def dibujar_texto_centrado(c, texto, x, y):
 def imprimir_ticket(ruta_pdf: str, impresora: str = None):
     """
     Envía el ticket a una impresora térmica.
+    Convierte el PDF a imagen PNG para mejor compatibilidad con impresoras térmicas.
     
     Args:
         ruta_pdf: Ruta del PDF a imprimir
@@ -345,10 +347,16 @@ def imprimir_ticket(ruta_pdf: str, impresora: str = None):
     
     try:
         if sistema == "Windows":
-            # Método mejorado para Windows con impresoras térmicas
+            # MÉTODO MEJORADO: Convertir PDF a PNG y luego imprimir
+            # Esto funciona MUCHO mejor con impresoras térmicas
             try:
+                import fitz  # PyMuPDF
+                from PIL import Image
                 import win32print
-                import win32api
+                import win32ui
+                from win32.lib import win32con
+                
+                print("Convirtiendo PDF a imagen para impresión térmica...")
                 
                 # Si no se especifica impresora, usar la predeterminada
                 if not impresora:
@@ -356,10 +364,129 @@ def imprimir_ticket(ruta_pdf: str, impresora: str = None):
                 
                 print(f"Imprimiendo en: {impresora}")
                 
-                # Intentar imprimir usando SumatraPDF (mejor para impresoras térmicas)
-                # Si no está disponible, usar el método estándar
+                # 1. Convertir PDF a imagen PNG de alta calidad
+                pdf_document = fitz.open(ruta_pdf)
+                page = pdf_document[0]  # Primera página
+                
+                # Renderizar a 300 DPI para buena calidad en térmica
+                mat = fitz.Matrix(300/72, 300/72)  # 300 DPI
+                pix = pdf_document[0].get_pixmap(matrix=mat, alpha=False)
+                
+                # Guardar como PNG temporal
+                import tempfile
+                temp_png = os.path.join(tempfile.gettempdir(), "ticket_temp_print.png")
+                pix.save(temp_png)
+                pdf_document.close()
+                
+                print(f"✓ PDF convertido a imagen: {temp_png}")
+                
+                # 2. Abrir la imagen con PIL y ajustar para impresora térmica
+                img = Image.open(temp_png)
+                
+                # Convertir a escala de grises si no lo está
+                if img.mode != 'L':
+                    img = img.convert('L')
+                
+                # Ajustar ancho para impresora térmica de 80mm
+                # 80mm a 203 DPI (resolución común de térmicas) = ~640 píxeles
+                ancho_termica = 576  # Ancho seguro para 80mm
+                
+                # Calcular altura proporcional
+                ratio = ancho_termica / img.width
+                altura_nueva = int(img.height * ratio)
+                
+                # Redimensionar imagen
+                img_redimensionada = img.resize((ancho_termica, altura_nueva), Image.Resampling.LANCZOS)
+                
+                # Aplicar umbral para blanco y negro puro (mejor para térmicas)
+                # Esto mejora la calidad de impresión
+                img_bw = img_redimensionada.point(lambda x: 0 if x < 128 else 255, '1')
+                
+                # Guardar imagen procesada
+                temp_png_procesado = os.path.join(tempfile.gettempdir(), "ticket_print_processed.bmp")
+                img_bw.save(temp_png_procesado, "BMP")
+                
+                print(f"✓ Imagen procesada para térmica: {ancho_termica}x{altura_nueva}px")
+                
+                # 3. Imprimir la imagen directamente usando win32print
                 try:
-                    # Buscar SumatraPDF en ubicaciones comunes
+                    # Obtener el handle de la impresora
+                    hPrinter = win32print.OpenPrinter(impresora)
+                    
+                    try:
+                        # Crear un contexto de dispositivo para la impresora
+                        hDC = win32ui.CreateDC()
+                        hDC.CreatePrinterDC(impresora)
+                        
+                        # Iniciar documento
+                        hDC.StartDoc("Ticket Factura")
+                        hDC.StartPage()
+                        
+                        # Abrir la imagen BMP
+                        bmp = Image.open(temp_png_procesado)
+                        
+                        # Obtener dimensiones de la impresora
+                        printer_width = hDC.GetDeviceCaps(win32con.HORZRES)
+                        printer_height = hDC.GetDeviceCaps(win32con.VERTRES)
+                        
+                        # Calcular escala para que la imagen ocupe el ancho completo
+                        scale = printer_width / bmp.width
+                        img_height = int(bmp.height * scale)
+                        
+                        # Asegurarse de que la altura no exceda la página
+                        if img_height > printer_height:
+                            scale = printer_height / bmp.height
+                            img_height = printer_height
+                            img_width = int(bmp.width * scale)
+                        else:
+                            img_width = printer_width
+                        
+                        # Dibujar la imagen
+                        dib = ImageWin.Dib(bmp)
+                        dib.draw(hDC.GetHandleOutput(), (0, 0, img_width, img_height))
+                        
+                        # Finalizar página y documento
+                        hDC.EndPage()
+                        hDC.EndDoc()
+                        
+                        print("✓ Imagen enviada a la impresora correctamente")
+                        
+                    finally:
+                        win32print.ClosePrinter(hPrinter)
+                        hDC.DeleteDC()
+                    
+                    # Limpiar archivos temporales
+                    try:
+                        os.remove(temp_png)
+                        os.remove(temp_png_procesado)
+                    except:
+                        pass
+                    
+                    return True
+                    
+                except Exception as e:
+                    print(f"⚠ Error con impresión directa de imagen: {e}")
+                    # Continuar con métodos alternativos
+                
+            except ImportError as e:
+                print(f"⚠ Dependencias no disponibles para conversión PDF→PNG: {e}")
+            except Exception as e:
+                print(f"⚠ Error al convertir PDF a imagen: {e}")
+                import traceback
+                traceback.print_exc()
+            
+            # FALLBACK: Métodos anteriores si la conversión a imagen falla
+            try:
+                import win32print
+                import win32api
+                
+                if not impresora:
+                    impresora = win32print.GetDefaultPrinter()
+                
+                print(f"Usando método alternativo de impresión para: {impresora}")
+                
+                # Intentar con SumatraPDF si está disponible
+                try:
                     import os
                     sumatra_paths = [
                         os.path.join(os.environ.get('ProgramFiles', 'C:\\Program Files'), 'SumatraPDF', 'SumatraPDF.exe'),
@@ -374,7 +501,6 @@ def imprimir_ticket(ruta_pdf: str, impresora: str = None):
                             break
                     
                     if sumatra_exe:
-                        # Usar SumatraPDF con impresión silenciosa
                         print(f"Usando SumatraPDF para imprimir")
                         subprocess.Popen([
                             sumatra_exe,
@@ -387,42 +513,7 @@ def imprimir_ticket(ruta_pdf: str, impresora: str = None):
                 except Exception as e:
                     print(f"⚠ SumatraPDF no disponible: {e}")
                 
-                # Método 2: Usar win32print directamente para enviar RAW data
-                # Esto funciona mejor con impresoras térmicas
-                try:
-                    print("Intentando impresión directa con win32print...")
-                    
-                    # Abrir la impresora
-                    hPrinter = win32print.OpenPrinter(impresora)
-                    
-                    try:
-                        # Iniciar trabajo de impresión
-                        hJob = win32print.StartDocPrinter(hPrinter, 1, (
-                            "Ticket Factura",
-                            None,
-                            "RAW"
-                        ))
-                        
-                        win32print.StartPagePrinter(hPrinter)
-                        
-                        # Leer el PDF y enviarlo como datos RAW
-                        with open(ruta_pdf, 'rb') as f:
-                            pdf_data = f.read()
-                            win32print.WritePrinter(hPrinter, pdf_data)
-                        
-                        win32print.EndPagePrinter(hPrinter)
-                        win32print.EndDocPrinter(hPrinter)
-                        
-                        print("✓ Ticket enviado a la impresora usando win32print RAW")
-                        return True
-                        
-                    finally:
-                        win32print.ClosePrinter(hPrinter)
-                        
-                except Exception as e:
-                    print(f"⚠ Error con win32print directo: {e}")
-                
-                # Método 3: Usar Adobe Reader / sistema predeterminado
+                # Método estándar de Windows
                 print("Usando método estándar de Windows (ShellExecute)...")
                 win32api.ShellExecute(
                     0,
@@ -433,17 +524,16 @@ def imprimir_ticket(ruta_pdf: str, impresora: str = None):
                     0
                 )
                 print("✓ Ticket enviado a la impresora usando ShellExecute")
-                print("⚠ Si no imprime correctamente, considera instalar SumatraPDF")
+                print("⚠ Si no imprime correctamente, instala SumatraPDF para mejor compatibilidad")
                 return True
                 
             except ImportError:
-                print("⚠ win32print no disponible, usando método alternativo...")
-                # Fallback: método anterior
+                print("⚠ win32print no disponible, usando método básico...")
                 if impresora:
                     subprocess.run(["print", f"/D:{impresora}", ruta_pdf], shell=True, check=True)
                 else:
                     os.startfile(ruta_pdf, "print")
-                print("✓ Ticket enviado a la impresora usando método alternativo")
+                print("✓ Ticket enviado usando método básico")
                 return True
                 
         elif sistema == "Linux":

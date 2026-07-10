@@ -843,22 +843,42 @@ class TicketGeneratorApp:
             return
         
         try:
-            # Si no hay impresora seleccionada, mostrar diálogo de selección
+            # Auto-seleccionar primera impresora si no hay una seleccionada
             if not self.impresora_seleccionada:
-                if not self.seleccionar_impresora():
-                    return  # Usuario canceló la selección
+                try:
+                    import win32print
+                    # Obtener lista de impresoras
+                    impresoras = [printer[2] for printer in win32print.EnumPrinters(
+                        win32print.PRINTER_ENUM_LOCAL | win32print.PRINTER_ENUM_CONNECTIONS)]
+                    
+                    if not impresoras:
+                        messagebox.showwarning("Advertencia", 
+                            "No se encontraron impresoras instaladas.\n"
+                            "Por favor, instale una impresora primero.")
+                        return
+                    
+                    # Usar la primera impresora disponible
+                    self.impresora_seleccionada = impresoras[0]
+                    print(f"Auto-seleccionada impresora: {self.impresora_seleccionada}")
+                    
+                except ImportError:
+                    # Si no está win32print, intentar obtener la predeterminada
+                    try:
+                        import win32print
+                        self.impresora_seleccionada = win32print.GetDefaultPrinter()
+                    except:
+                        # Usar None para que el sistema use la predeterminada
+                        self.impresora_seleccionada = None
+                        print("Usando impresora predeterminada del sistema")
             
             # Imprimir usando la función del módulo ticket_genrator
+            print(f"Imprimiendo en: {self.impresora_seleccionada}")
             resultado = imprimir_ticket(self.ruta_pdf_generado, self.impresora_seleccionada)
             
             if resultado:
                 messagebox.showinfo("Impresión Enviada", 
-                    f"Ticket enviado a la impresora:\n{self.impresora_seleccionada}\n\n"
-                    "Si no imprime correctamente:\n"
-                    "1. Verifica que la impresora esté encendida\n"
-                    "2. Revisa que tenga papel\n"
-                    "3. Intenta usar 'Abrir PDF' e imprimir manualmente\n\n"
-                    "Para impresoras térmicas, se recomienda instalar SumatraPDF")
+                    f"Ticket enviado a la impresora:\n{self.impresora_seleccionada or 'Predeterminada'}\n\n"
+                    "El ticket se está imprimiendo...")
             else:
                 messagebox.showwarning("Impresión", 
                     "No se pudo confirmar la impresión.\n"
@@ -871,6 +891,8 @@ class TicketGeneratorApp:
                 "1. Usar el botón 'Abrir PDF' e imprimir manualmente\n"
                 "2. Verificar que la impresora esté correctamente instalada\n"
                 "3. Revisar los permisos del programa")
+            import traceback
+            traceback.print_exc()
     
     def abrir_pdf(self):
         """Abre el PDF generado con el visor predeterminado."""

@@ -1,11 +1,11 @@
 {
-  "version": "1.0.9",
+  "version": "1.0.10",
   "fecha": "2026-07-10",
   "cambios": [
-    "CORREGIDO: Auto-actualizador ahora se instala automáticamente",
-    "Instalación silenciosa (sin ventanas del instalador)",
-    "El programa se cierra correctamente al actualizar",
-    "Sistema de impresión mejorado para térmicas",
-    "Instalación en AppData Local (sin permisos admin)"
+    "NUEVO: Impresión directa optimizada para impresoras térmicas",
+    "Conversión automática de PDF a PNG para mejor compatibilidad",
+    "Auto-selección de primera impresora disponible",
+    "Impresión en un solo clic (sin diálogos)",
+    "Ajuste automático de tamaño para térmicas de 80mm"
   ]
 }

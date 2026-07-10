@@ -2,7 +2,7 @@
 ; Generador de Tickets - Instalador Automático
 
 #define MyAppName "Generador de Tickets"
-#define MyAppVersion "1.0.6"
+#define MyAppVersion "1.0.7"
 #define MyAppPublisher "TiketEx"
 #define MyAppExeName "GeneradorTickets.exe"
 
@@ -12,7 +12,8 @@ AppId={{F4A2E8B6-9C3D-4F1E-8A7B-5D2C9E1F4A3B}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
-DefaultDirName={autopf}\{#MyAppName}
+; Instalar en AppData Local por defecto (sin permisos de admin)
+DefaultDirName={localappdata}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 ; Icono del instalador
 SetupIconFile=disenos\raffle-ticket-blue.ico
@@ -22,8 +23,8 @@ OutputBaseFilename=GeneradorTickets_Instalador_v{#MyAppVersion}
 ; Compresión
 Compression=lzma2/max
 SolidCompression=yes
-; Permisos
-PrivilegesRequired=admin
+; NO requiere permisos de administrador (instala en AppData)
+PrivilegesRequired=lowest
 ; Interfaz
 WizardStyle=modern
 DisableProgramGroupPage=yes

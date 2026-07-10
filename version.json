@@ -1,11 +1,11 @@
 {
-  "version": "1.0.6",
+  "version": "1.0.7",
   "fecha": "2026-07-10",
   "cambios": [
-    "CORREGIDO: Auto-actualizador ahora funciona correctamente",
-    "version.json se guarda en AppData (evita problemas de permisos)",
-    "Instalador se descarga y ejecuta automáticamente",
-    "Ya no es necesario desinstalar manualmente para actualizar",
-    "Mejorados patrones de extracción de sello, QR, email y teléfono"
+    "Instalación ahora en AppData Local (sin permisos de administrador)",
+    "Ruta por defecto: C:\\Users\\[usuario]\\AppData\\Local\\Generador de Tickets",
+    "Ya no requiere permisos de administrador para instalar",
+    "Auto-actualizador completamente funcional",
+    "Todos los datos del ticket se muestran correctamente"
   ]
 }
